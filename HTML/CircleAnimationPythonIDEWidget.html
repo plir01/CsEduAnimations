@@ -1,0 +1,510 @@
+<!-- Python Circle Animation Widget -->
+<div id="python-circle-animation" class="animation-widget">
+    <style>
+        #python-circle-animation {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background: white;
+        }
+
+        #python-circle-animation .animation-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            max-width: 600px;
+            padding-bottom: 80px;  /* Space for the message */
+        }
+
+        #python-circle-animation .animation-section {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        #python-circle-animation .ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: background-color 0.3s;
+            z-index: 2;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #python-circle-animation .cycle-counter {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            transition: color 0.2s, transform 0.2s;
+            z-index: 1;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.8);
+            padding: 10px;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        #python-circle-animation .cycle-counter.highlight {
+            color: #4CAF50;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        #python-circle-animation .message {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            text-align: center;
+            min-width: 200px;
+            max-width: 300px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            pointer-events: none;
+        }
+
+        #python-circle-animation .message::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: -10px;
+            transform: translateX(-50%);
+            border-style: solid;
+            border-width: 0 10px 10px 10px;
+            border-color: transparent transparent #4CAF50 transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        #python-circle-animation .message.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        #python-circle-animation .message.hide {
+            opacity: 0;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #python-circle-animation .speed-control {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        #python-circle-animation .speed-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        #python-circle-animation .controls {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        #python-circle-animation .run-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        #python-circle-animation .run-button:hover {
+            background: #45a049;
+        }
+
+        #python-circle-animation .pause-button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 5px;
+            transition: background 0.3s;
+        }
+
+        #python-circle-animation .pause-button:hover {
+            background: #da190b;
+        }
+
+        #python-circle-animation .reset-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 5px;
+            transition: background 0.3s;
+        }
+
+        #python-circle-animation .reset-button:hover {
+            background: #1976D2;
+        }
+
+        #python-circle-animation .ide-section {
+            margin: 20px 0;
+        }
+
+        #python-circle-animation #code-editor {
+            width: 100%;
+            height: 300px;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        #python-circle-animation .CodeMirror {
+            height: 300px !important;
+        }
+    </style>
+
+    <div class="animation-container">
+        <div class="animation-section">
+            <div class="ball"></div>
+            <div class="cycle-counter"><span id="cycles">0</span></div>
+        </div>
+        <div class="message" id="message">Let's get spinning! 🌀</div>
+    </div>
+
+    <div class="speed-control">
+        Speed: <span id="speed-value">50%</span>
+        <input type="range" id="speed-slider" class="speed-slider" min="0" max="100" value="50">
+    </div>
+
+    <div class="controls">
+        <button class="pause-button">Pause</button>
+        <button class="reset-button">Reset Cycles</button>
+    </div>
+
+    <div class="ide-section">
+        <textarea id="code-editor">speed = 50  # Change this value between 0-100
+
+def update_ball_position():
+    global speed, cycles
+    
+    if cycles >= 100:
+        show_message("Amazing! 💯 cycles completed! 🎉")
+    elif cycles >= 50:
+        show_message("Halfway there! 🌟 Keep going!")
+    elif cycles >= 25:
+        show_message("You're on a roll! 🎯")
+    elif cycles >= 10:
+        show_message("Great start! 🚀 Keep it up!")
+    else:
+        # Keep going!
+        pass
+
+    return speed</textarea>
+        <div class="controls">
+            <button class="run-button">Run Code</button>
+        </div>
+    </div>
+</div>
+
+<!-- Required CodeMirror Dependencies -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+
+<script>
+// Initialize when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize CodeMirror
+    const editor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
+        mode: "python",
+        theme: "monokai",
+        lineNumbers: true,
+        indentUnit: 4,
+        tabSize: 4
+    });
+
+    // Get elements within our widget scope
+    const widget = document.getElementById('python-circle-animation');
+    const ball = widget.querySelector(".ball");
+    const cycleCounter = widget.querySelector("#cycles");
+    const speedSlider = widget.querySelector("#speed-slider");
+    const speedValue = widget.querySelector("#speed-value");
+    const messageElement = widget.querySelector("#message");
+    const pauseButton = widget.querySelector(".pause-button");
+
+    // Animation variables
+    let angle = 0;
+    let lastAngle = 0;
+    let lastTime = 0;
+    let cycles = 0;
+    let animationId = null;
+    let isPaused = false;
+    let reachedMilestones = new Set();
+    let milestoneConditions = [[
+        { cycles: 100, message: "Amazing! 💯 cycles completed! 🎉", type: 'if' },
+        { cycles: 50, message: "Halfway there! 🌟 Keep going!", type: 'elif' },
+        { cycles: 25, message: "You're on a roll! 🎯", type: 'elif' },
+        { cycles: 10, message: "Great start! 🚀 Keep it up!", type: 'elif' }
+    ]];
+
+    // Make functions available globally for the widget
+    widget.showMessage = showMessage;
+    widget.runCode = runCode;
+    widget.togglePause = togglePause;
+    widget.resetCycles = resetCycles;
+
+    function showMessage(message) {
+        messageElement.textContent = message;
+        
+        // Clear any existing timeouts
+        if (window.toastTimeout) {
+            clearTimeout(window.toastTimeout);
+        }
+        
+        // Remove old classes
+        messageElement.classList.remove('show', 'hide');
+        
+        // Force reflow
+        messageElement.offsetHeight;
+        
+        // Show message
+        messageElement.classList.add('show');
+        
+        // Hide after 1.5 seconds
+        window.toastTimeout = setTimeout(() => {
+            messageElement.classList.add('hide');
+        }, 1500);
+    }
+
+    function parseConditions(code) {
+        const conditions = [];
+        let currentGroup = [];
+        
+        // Split code into lines
+        const lines = code.split('\n');
+        let inIfBlock = false;
+        
+        for (let line of lines) {
+            line = line.trim();
+            
+            if (line.startsWith('if cycles >=')) {
+                inIfBlock = true;
+                currentGroup = [];
+                const match = line.match(/if cycles >= (\d+):/);
+                if (match) {
+                    currentGroup.push({
+                        cycles: parseInt(match[1]),
+                        message: null,
+                        type: 'if'
+                    });
+                }
+            } else if (line.startsWith('elif cycles >=')) {
+                const match = line.match(/elif cycles >= (\d+):/);
+                if (match && inIfBlock) {
+                    currentGroup.push({
+                        cycles: parseInt(match[1]),
+                        message: null,
+                        type: 'elif'
+                    });
+                }
+            } else if (line.startsWith('show_message(')) {
+                const match = line.match(/show_message\("([^"]+)"\)/);
+                if (match && currentGroup.length > 0) {
+                    currentGroup[currentGroup.length - 1].message = match[1];
+                }
+            } else if (line.startsWith('else:')) {
+                if (inIfBlock) {
+                    currentGroup.push({
+                        cycles: 0,
+                        message: null,
+                        type: 'else'
+                    });
+                }
+            } else if (line === '' && currentGroup.length > 0) {
+                conditions.push([...currentGroup]);
+                currentGroup = [];
+                inIfBlock = false;
+            }
+        }
+        
+        if (currentGroup.length > 0) {
+            conditions.push([...currentGroup]);
+        }
+        
+        return conditions;
+    }
+
+    function checkConditions(cycles, conditions) {
+        if (!conditions || !conditions.length) return;
+        
+        // Go through each set of conditions
+        for (const conditionSet of conditions) {
+            // Sort conditions by cycle count in descending order
+            const sortedConditions = conditionSet.sort((a, b) => b.cycles - a.cycles);
+            
+            // Find the first matching condition that hasn't been shown yet
+            for (const condition of sortedConditions) {
+                if (cycles >= condition.cycles && !reachedMilestones.has(condition.cycles)) {
+                    reachedMilestones.add(condition.cycles);
+                    showMessage(condition.message);
+                    break;
+                }
+            }
+        }
+    }
+
+    function updateBallPosition(currentTime) {
+        if (!lastTime) lastTime = currentTime;
+        const deltaTime = currentTime - lastTime;
+        
+        lastAngle = angle;
+        // Exponential speed curve with much faster maximum
+        const normalizedSpeed = speedSlider.value / 100;
+        const speedFactor = normalizedSpeed < 0.8 
+            ? normalizedSpeed * 2 
+            : Math.pow(normalizedSpeed * 5, 3);
+        const speed = speedFactor * 360 / 1000;
+        angle = (angle + speed * deltaTime) % 360;
+
+        if (lastAngle > angle) {
+            cycles++;
+            cycleCounter.textContent = cycles;
+            cycleCounter.classList.add('highlight');
+            setTimeout(() => {
+                cycleCounter.classList.remove('highlight');
+            }, 200);
+
+            // Check conditions using the if-elif-else structure
+            checkConditions(cycles, milestoneConditions);
+        }
+
+        const radius = 100;
+        const centerX = 100;
+        const centerY = 100;
+        
+        const radians = (angle + 90) * (Math.PI / 180);
+        const x = centerX + radius * Math.cos(radians);
+        const y = centerY + radius * Math.sin(radians);
+        
+        ball.style.left = `${x}px`;
+        ball.style.top = `${y}px`;
+
+        lastTime = currentTime;
+        if (!isPaused) {
+            animationId = requestAnimationFrame(updateBallPosition);
+        }
+    }
+
+    function togglePause() {
+        isPaused = !isPaused;
+        pauseButton.textContent = isPaused ? "Resume" : "Pause";
+        
+        if (isPaused) {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+        } else {
+            lastTime = 0;
+            animationId = requestAnimationFrame(updateBallPosition);
+        }
+    }
+
+    function runCode() {
+        try {
+            const code = editor.getValue();
+            const speed = parseFloat(eval(code));
+            
+            if (!isNaN(speed)) {
+                speedSlider.value = speed;
+                speedValue.textContent = `${speed}%`;
+                
+                if (speed == 0 || isPaused) {
+                    cancelAnimationFrame(animationId);
+                    lastTime = 0;
+                    animationId = null;
+                } else if (!animationId) {
+                    animationId = requestAnimationFrame(updateBallPosition);
+                }
+            }
+            
+            milestoneConditions = parseConditions(code);
+        } catch (error) {
+            console.error('Error running code:', error);
+        }
+    }
+
+    function resetCycles() {
+        cycles = 0;
+        cycleCounter.textContent = cycles;
+        reachedMilestones.clear();
+    }
+
+    function updateEditorSpeed(speed) {
+        const code = editor.getValue();
+        const newCode = code.replace(/speed = \d+/, `speed = ${speed}`);
+        editor.setValue(newCode);
+    }
+
+    // Update button onclick handlers to use widget-scoped functions
+    widget.querySelector('.pause-button').onclick = togglePause;
+    widget.querySelector('.reset-button').onclick = resetCycles;
+    widget.querySelector('.run-button').onclick = runCode;
+
+    // Update speed display when slider changes
+    speedSlider.addEventListener('input', () => {
+        const newSpeed = speedSlider.value;
+        speedValue.textContent = `${newSpeed}%`;
+        updateEditorSpeed(newSpeed);
+        
+        if (newSpeed == 0 || isPaused) {
+            cancelAnimationFrame(animationId);
+            lastTime = 0;
+            animationId = null;
+        } else if (!animationId) {
+            animationId = requestAnimationFrame(updateBallPosition);
+        }
+    });
+
+    // Start animation
+    animationId = requestAnimationFrame(updateBallPosition);
+});
+</script>
